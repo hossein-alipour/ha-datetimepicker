@@ -24,7 +24,8 @@ Just download the files and and include JS, CSS and other resource files in your
   
 #Features
 You can initiate your HA-DateTimePicker with this set of options:
-*Note: your can use with javascript object or HTML Attribute*
+
+*Note: you can use with javascript object or HTML Attribute*
 
 Javascript option | HTML attribute | Type | description
 ------------ | ------------- | ------------- | -------------
