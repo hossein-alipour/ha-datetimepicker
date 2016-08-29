@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <title>HA-DatePicker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="src/ha-datetimepicker.min.css" rel="stylesheet">
+    <style>
+        html * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            padding: 0;
+            margin: 0;
+        }
+        
+        header {
+            background-color: #4A5867;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        header h1,
+        header p {
+            color: #fff;
+            text-align: center;
+        }
+        
+        input {
+            display: table;
+            margin: auto;
+            height: 40px;
+            border: 1px solid #ebebeb;
+            border-radius: 2px;
+            text-align: center;
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: table;
+            margin: auto;
+            text-align: center;
+            color: #666;
+        }
+        
+        fieldset {
+            border: none;
+        }
+        
+        a {
+            display: table;
+            margin: auto;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>HA-DateTimePicker</h1>
+        <p>A Solar and Gregorian date and time picker</p>
+    </header>
+    <fieldset>
+        <label>Select a date and time:</label>
+        <input type="text" id="date" name="test" value="2/25/2016" data-ha-datetimepicker="#date" data-ha-dp-forcesettime="true" />
+        <label>Select a date and time(Solar Date):</label>
+        <input type="text" id="date2" name="test" data-ha-datetimepicker="#date2" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" />
+        <label>Select a date(Result in Solar):</label>
+        <input type="text" id="date3" name="test" data-ha-datetimepicker="#date3" data-ha-dp-forcesettime="true" data-ha-dp-issolar="false" data-ha-dp-resultinsolar="true" data-ha-dp-disabletime="true" />
+
+
+        <label>Called by Javascript:</label>
+        <input type="text" id="date4" />
+    </fieldset>
+    <a href="https://github.com/hossein-alipour/ha-datetimepicker">Download HA-DateTimePicker</a>
+</body>
+<script src="src/ha-solardate.js"></script>
+<script src="src/ha-datetimepicker.js"></script>
+
+<script>
+    var dp = new HaDateTimePicker("#date4", {
+        forceSetTime: true,
+        disableTime: true
+    });
+    dp.show();
+</script>
+
+
+</html>
