@@ -67,13 +67,12 @@
     </header>
     <fieldset>
         <label>Select a date and time:</label>
-        <input type="text" id="date" name="test" value="2/25/2016" data-ha-datetimepicker="#date" data-ha-dp-forcesettime="true" />
+        <input type="text" id="date" name="test" value="2/25/2016" data-ha-datetimepicker="#date" data-ha-dp-forcesettime="true" data-ha-dp-resultformat="{day} {month} {year}" />
         <label>Select a date and time(Solar Date):</label>
-        <input type="text" id="date2" name="test" data-ha-datetimepicker="#date2" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" />
+        <input type="text" id="date2" name="test" data-ha-datetimepicker="#date2" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" data-ha-dp-minAllowedDate="2/5/1395" data-ha-dp-maxAllowedDate="3/5/1395" />
         <label>Select a date(Result in Solar):</label>
-        <input type="text" id="date3" name="test" data-ha-datetimepicker="#date3" data-ha-dp-forcesettime="true" data-ha-dp-issolar="false" data-ha-dp-resultinsolar="true" data-ha-dp-disabletime="true" />
-
-
+        <input type="text" id="date3" name="test" data-ha-datetimepicker="#date3" data-ha-dp-forcesettime="true" data-ha-dp-issolar="false" data-ha-dp-minAllowedDate="9/2/2016" data-ha-dp-maxAllowedDate="10/2/2016" data-ha-dp-resultinsolar="true" data-ha-dp-disabletime="true"
+        />
         <label>Called using Javascript:</label>
         <input type="text" id="date4" />
     </fieldset>
@@ -85,7 +84,10 @@
 <script>
     var dp = new HaDateTimePicker("#date4", {
         forceSetTime: true,
-        disableTime: true
+        // disableTime: true,
+        minAllowedDate: new Date(2013, 7, 15),
+        maxAllowedDate: new Date(2018, 8, 18),
+        resultFormat: "{year}/{month}/{day} {hour}{t?:}{minute} {ampm}"
     });
     dp.show();
 </script>

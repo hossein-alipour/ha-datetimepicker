@@ -1,82 +1,132 @@
-// HA-PopOver v1.0 � 2016 by Hossein Alipour http://hosseinalipour.ir
+// HA-PopOver v1.1 © 2016 by Hossein Alipour http://hosseinalipour.ir
 
 function HaSolarDate(year, month, day, hour, minute, second) {
-    if (year == null && month == null && day == null) {
-        var d = new Date();
+    if ((year instanceof String || typeof year === 'string') && year.indexOf("/") > -1) {
+        var datetime = year.split(" ");
+        var date, time, ampm;
+        for (var d = 0; d < datetime.length; d++) {
+            if (datetime[d].indexOf("/") > -1)
+                date = datetime[d];
+            else if (datetime[d].indexOf(":") > -1)
+                time = datetime[d];
+            else if (datetime[d].toLowerCase().indexOf("am") > -1 || datetime[d].toLowerCase().indexOf("pm") > -1)
+                ampm = datetime[d];
+        }
 
-        var sd = this.convertFromGregorian(d);
-        this.year = sd.getFullYear();
-        this.month = sd.getMonth();
-        this.day = sd.getDate();
+        if (date != null) {
+            var dateValues = date.split("/");
+            this.month = dateValues[0];
+            this.day = dateValues[1];
+            this.year = dateValues[2];
+        }
+
+        if (time != null) {
+            var timeValues = date.split(":");
+            this.hour = values[0];
+            this.minute = values[1];
+            if (ampm != null) {
+                if (ampm.toLowerCase() == "pm")
+                    this.hour += 12;
+            }
+        } else {
+            this.hour = 0;
+            this.minute = 0;
+        }
+    } else if (year instanceof HaSolarDate) {
+        this.year = year.getFullYear();
+        this.month = year.getMonth();
+        this.day = year.getDate();
+        this.hour = year.getHours();
+        this.minute = year.getMinutes();
+        this.second = year.getSeconds();
+
+    } else if (year instanceof Date) {
+        var d = this.convertFromGregorian(year);
+        this.year = d.getFullYear();
+        this.month = d.getMonth();
+        this.day = d.getDate();
+        this.hour = d.getHours();
+        this.minute = d.getMinutes();
+        this.second = d.getSeconds();
     } else {
-        this.year = year;
-        this.month = month;
-        this.day = day;
+        if (year == null && month == null && day == null) {
+            var d = new Date();
+            var sd = this.convertFromGregorian(d);
+            this.year = sd.getFullYear();
+            this.month = sd.getMonth();
+            this.day = sd.getDate();
+        } else {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        }
+
+        this.hour = hour || 0;
+        this.minute = minute || 0;
+        this.second = second || 0;
     }
 
-    this.hour = hour || 0;
-    this.minute = minute || 0;
-    this.second = second || 0;
-    this.getFullYear = function() {
-        return this.year;
-    }
+}
 
-    this.getMonth = function() {
-        return this.month;
-    }
+HaSolarDate.prototype.monthNames = [
+    "فروردین",
+    "اردیبهشت",
+    "خرداد",
+    "تیر",
+    "مرداد",
+    "شهریور",
+    "مهر",
+    "آبان",
+    "آذر",
+    "دی",
+    "بهمن",
+    "اسفند"
+];
 
-    this.getDate = function() {
-        return this.day;
-    }
+HaSolarDate.prototype.dayNames = [
+    "شنبه",
+    "یکشنبه",
+    "دوشنبه",
+    "سشنبه",
+    "چهارشنبه",
+    "پنجشنبه",
+    "جمعه"
+];
 
-    this.getHours = function() {
-        return this.hour;
-    }
+HaSolarDate.prototype.getFullYear = function() {
+    return this.year;
+}
 
-    this.getMinutes = function() {
-        return this.minute;
-    }
+HaSolarDate.prototype.getMonth = function() {
+    return this.month;
+}
 
-    this.getSeconds = function() {
-        return this.second;
-    }
+HaSolarDate.prototype.getDate = function() {
+    return this.day;
+}
 
-    this.setHours = function(newHours) {
-        this.hour = newHours;
-    }
+HaSolarDate.prototype.getHours = function() {
+    return this.hour;
+}
 
-    this.setMinutes = function(newMinutes) {
-        this.minute = newMinutes;
-    }
+HaSolarDate.prototype.getMinutes = function() {
+    return this.minute;
+}
 
-    this.setSeconds = function(newSeconds) {
-        this.second = newSeconds;
-    }
+HaSolarDate.prototype.getSeconds = function() {
+    return this.second;
+}
 
-    this.monthNames = [
-        "فروردین",
-        "اردیبهشت",
-        "خرداد",
-        "تیر",
-        "مرداد",
-        "شهریور",
-        "مهر",
-        "آبان",
-        "آذر",
-        "دی",
-        "بهمن",
-        "اسفند"
-    ];
+HaSolarDate.prototype.setHours = function(newHours) {
+    this.hour = newHours;
+}
 
-    this.dayNames = [
-        "شنبه",
-        "یکشنبه",
-        "دوشنبه",
-        "سشنبه",
-        "چهارشنبه",
-        "پنجشنبه",
-        "جمعه"
-    ];
+HaSolarDate.prototype.setMinutes = function(newMinutes) {
+    this.minute = newMinutes;
+}
+
+HaSolarDate.prototype.setSeconds = function(newSeconds) {
+    this.second = newSeconds;
 }
 
 HaSolarDate.prototype.toString = function() {
@@ -163,10 +213,10 @@ HaSolarDate.prototype.convertFromGregorian = function(gregorianDate) {
 }
 
 HaSolarDate.prototype.setDate = function(newDate) {
-    var date = this.getDayOfYear() + newDate;
+    var date = new HaSolarDate(this.year, this.month, 0).getDayOfYear() + newDate;
     if (date <= 186) {
         this.month = Math.floor(date / 31);
-        this.day = date % 31;
+        this.day = (date - (this.month * 31)) % 31;
         if (this.day == 0) {
             this.day = 31;
             this.month--;
@@ -174,7 +224,7 @@ HaSolarDate.prototype.setDate = function(newDate) {
     } else {
         date -= 186;
         this.month = 6 + Math.floor(date / 30);
-        this.day = date % 30;
+        this.day = (date - ((this.month - 6) * 30)) % 30;
         if (this.day == 0) {
             this.day = 30;
             this.month--;
