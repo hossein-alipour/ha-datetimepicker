@@ -15,6 +15,11 @@ v1.1
 
 Just download the files and and include JS, CSS and other resource files in your project
 
+NuGet:
+```
+install-package hadatetimepicker
+```
+
 # How to use
 
 ## - Add *data-ha-datetimepicker* attribute to your DOMElement
