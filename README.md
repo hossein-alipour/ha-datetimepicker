@@ -15,10 +15,14 @@ v1.1
 
 Just download the files and and include JS, CSS and other resource files in your project
 
-NuGet:
-```
-install-package hadatetimepicker
-```
+# NuGet Package
+ 
+ NuGet is a standard package manager for .NET Applications, It's simplest solution for ASP.NET Web Developers and Visual Studio Developers to install the latest release of packages with just type the below command and press enter
+ 
+ ```
+ Install-Package hadatetimepicker
+ ```
+ 
 
 # How to use
 
