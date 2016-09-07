@@ -15,6 +15,18 @@ v1.1
 
 Just download the files and and include JS, CSS and other resource files in your project
 
+JS Files:
+```
+<script type="text/javascript" src="ha-solardate.min.js"></script>
+<script type="text/javascript" src="ha-datetimepicker.min.js"></script>
+```
+*Note: Be sure to include the ha-solardate.js file before ha-datetimepicker*
+
+CSS File:
+```
+<link rel="stylesheet" type="text/css" href="h-datetimepicker.css" />
+```
+
 # NuGet Package
  
  NuGet is a standard package manager for .NET Applications, It's simplest solution for ASP.NET Web Developers and Visual Studio Developers to install the latest release of packages with just type the below command and press enter
