@@ -20,7 +20,7 @@ JS Files:
 <script type="text/javascript" src="ha-solardate.min.js"></script>
 <script type="text/javascript" src="ha-datetimepicker.min.js"></script>
 ```
-*Note: Be sure to include the ha-solardate.js file before ha-datetimepicker*
+*Note: Be sure to include the ha-solardate.js file before ha-datetimepicker.js*
 
 CSS File:
 ```
