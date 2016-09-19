@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>HA-DatePicker</title>
+    <title>HA-DateTimePicker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="src/ha-datetimepicker.min.css" rel="stylesheet">
     <style>
@@ -69,27 +69,44 @@
         <label>Select a date and time:</label>
         <input type="text" id="date" name="test" value="2/25/2016" data-ha-datetimepicker="#date" data-ha-dp-forcesettime="true" data-ha-dp-resultformat="{day} {month} {year}" />
         <label>Select a date and time(Solar Date):</label>
-        <input type="text" id="date2" name="test" data-ha-datetimepicker="#date2" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" data-ha-dp-minAllowedDate="2/5/1395" data-ha-dp-maxAllowedDate="3/5/1395" />
-        <label>Select a date(Result in Solar):</label>
-        <input type="text" id="date3" name="test" data-ha-datetimepicker="#date3" data-ha-dp-forcesettime="true" data-ha-dp-issolar="false" data-ha-dp-minAllowedDate="9/2/2016" data-ha-dp-maxAllowedDate="10/2/2016" data-ha-dp-resultinsolar="true" data-ha-dp-disabletime="true"
+        <input type="text" id="date2" name="test" data-ha-datetimepicker="#date2" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" data-ha-dp-resultinsolar="true" data-ha-dp-disabledWeekDays="2,3,7" data-ha-dp-resultformat="{day}/{month}/{year}" value="1/6/1395"
         />
+        <label>Select a date(Result in Solar):</label>
+        <input type="text" id="date3" name="test" data-ha-datetimepicker="#date3" data-ha-dp-forcesettime="true" data-ha-dp-issolar="false" data-ha-dp-resultinsolar="true" data-ha-dp-disabledWeekDays="1,3,6,5,7" />
         <label>Called using Javascript:</label>
         <input type="text" id="date4" />
+
+        <label>Called using Javascript(elem):</label>
+        <input type="text" id="date5" onclick="showDp()" />
+
+        <label>Lunar:</label>
+        <input type="text" id="date6" name="test" data-ha-datetimepicker="#date6" data-ha-dp-forcesettime="true" data-ha-dp-islunar="true" data-ha-dp-resultinsolar="true" />
     </fieldset>
     <a href="https://github.com/hossein-alipour/ha-datetimepicker">Download HA-DateTimePicker</a>
+    <br/>
+    <p style="color:#666; text-align: center">NOTE: This is a temporary sample page, the full document coming soon...</p>
 </body>
 <script src="src/ha-solardate.js"></script>
+<script src="src/ha-lunardate.js"></script>
 <script src="src/ha-datetimepicker.js"></script>
 
 <script>
     var dp = new HaDateTimePicker("#date4", {
         forceSetTime: true,
         // disableTime: true,
+        // isLunar: true,
         minAllowedDate: new Date(2013, 7, 15),
         maxAllowedDate: new Date(2018, 8, 18),
-        resultFormat: "{year}/{month}/{day} {hour}{t?:}{minute} {ampm}"
+        resultFormat: "{year}/{month}/{day} {hour}{t?:}{minute} {ampm}",
+        disabledWeekDays: "1,3,5"
     });
     dp.show();
+    var elem = document.getElementById("date5");
+    var dp2 = new HaDateTimePicker(elem);
+
+    function showDp() {
+        dp2.show();
+    }
 </script>
 
 
