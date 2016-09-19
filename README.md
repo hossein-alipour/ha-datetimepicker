@@ -25,6 +25,7 @@ Just download the files and and include JS, CSS and other resource files in your
 JS Files:
 ```
 <script type="text/javascript" src="ha-solardate.min.js"></script>
+<script type="text/javascript" src="ha-lunardate.min.js"></script> // If you dont need the lunar calendar features, just ignore this line
 <script type="text/javascript" src="ha-datetimepicker.min.js"></script>
 ```
 *Note: Be sure to include the ha-solardate.js file before ha-datetimepicker.js*
