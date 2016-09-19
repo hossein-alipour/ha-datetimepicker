@@ -14,8 +14,8 @@
          date: options.date || new Date(),
          isSolar: isSolar,
          isLunar: isLunar,
-         maxYear: options.maxYear || isSolar === true ? 1450 : isLunar === true ? 1380 : 2050,
-         minYear: options.minYear || isSolar === true ? 1350 : isLunar === true ? 1480 : 1950,
+         maxYear: options.maxYear || isSolar === true ? 1450 : isLunar === true ? 1480 : 2050,
+         minYear: options.minYear || isSolar === true ? 1350 : isLunar === true ? 1380 : 1950,
          pagingDuration: options.pagingDuration || 600,
          selectedDate: options.selectedDate || null,
          minAllowedDate: options.minAllowedDate || null,
@@ -43,7 +43,6 @@
          this.options.resultInSolar = false;
      } else {
          this.solarDate = new HaSolarDate();
-
      }
 
      if (typeof HaLunarDate === "undefined") {
