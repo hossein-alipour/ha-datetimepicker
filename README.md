@@ -86,7 +86,7 @@ pagingDuration | data-ha-dp-pagingduration | Number | The duration time of chang
 minAllowedDate | data-ha-dp-minalloweddate | Date | The minimum date that the user can select
 maxAllowedDate | data-ha-dp-maxalloweddate | Date | The maximum date that the user can select
 resultFormat | data-ha-dp-resultformat | String | The string format of date and time result. use {year} for year, {month} for month, {day} for day, {hour} for hour, {minute} for minute, {ampm} for AM or Pm and if you want to display some text only when time is available put in between {t? and }. ex. {month}/{day}/{year} {t?{hour}:{minute} {ampm}}
-disabledWeekDays | data-ha-dp-disabledweekdays | Array or String(sparated by comma) | Use the number of week days to disable them.  1 for Sunday(یکشنبه or الأحد) and 7 for Saturday(شنبه or السبت)
+disabledWeekDays | data-ha-dp-disabledweekdays | Array or String(separated by comma) | Use the number of week days to disable them.  1 for Sunday(یکشنبه or الأحد) and 7 for Saturday(شنبه or السبت)
 
 
 
