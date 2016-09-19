@@ -70,13 +70,16 @@ selectedDate | data-ha-dp-selecteddate | Date | Selected Date
 minYear | data-ha-dp-minyear | Number | The first year in the year dropdown list
 maxYear | data-ha-dp-maxyear | Number | The last year in the year dropdown list
 isSolar | data-ha-dp-issolar | Boolean | Turns into Solar(Persian) Calendar
+isLunar | data-ha-dp-islunar | Boolean | Turns into Lunar(Arabic) Calendar
 resultInSolar | data-ha-dp-resultinsolar | Boolean | Returns the result in Solar(Persian) date mode
+resultInLunar | data-ha-dp-resultinlunar | Boolean | Returns the result in Lunar(Arabic) date mode
 forceSetTime | data-ha-dp-forcesettime | Boolean | Forces the user to set the time
 disableTime | data-ha-dp-disabletime | Boolean | Disables the time feature
 pagingDuration | data-ha-dp-pagingduration | Number | The duration time of changing month (In Miliseconds)
 minAllowedDate | data-ha-dp-minalloweddate | Date | The minimum date that the user can select
 maxAllowedDate | data-ha-dp-maxalloweddate | Date | The maximum date that the user can select
 resultFormat | data-ha-dp-resultformat | String | The string format of date and time result. use {year} for year, {month} for month, {day} for day, {hour} for hour, {minute} for minute, {ampm} for AM or Pm and if you want to display some text only when time is available put in between {t? and }. ex. {month}/{day}/{year} {t?{hour}:{minute} {ampm}}
+disabledWeekDays | data-ha-dp-disabledweekdays | Array or String(sparated by comma) | Use the number of week days to disable them.  1 for Sunday(یکشنبه or الأحد) and 7 for Saturday(شنبه or السبت)
 
 
 
