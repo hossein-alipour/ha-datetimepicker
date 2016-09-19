@@ -43,7 +43,7 @@ CSS File:
  Install-Package hadatetimepicker
  ```
  
-#npm
+#npm Package
 npm is a NodeJS package manager. As its name would imply, you can use it to install node programs. Also, if you use it in development, it makes it easier to specify and link dependencies type the below command in your Command Prompt or Terminal and press enter
 
 ```
