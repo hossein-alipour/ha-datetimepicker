@@ -4,6 +4,13 @@ A date and time picker with Solar(Persian) and Gregorian calendars
 ##View [Demo](http://demos.hosseinalipour.ir/ha-datetimepicker)
 
 # Changelog
+v1.2
+ - Added Lunar Date (هجری قمری)
+ - Added feature of changing hour and minute via mouse wheel
+ - Added Disbaled Week days feature
+ - Minor Improvements
+ - Minor bug fixes
+
 v1.1
  - Added Max an Min Allowed Date: choose the maximum and minimum date that the user can select 
  - DateTimePicker will now close when clicking outsite of it
