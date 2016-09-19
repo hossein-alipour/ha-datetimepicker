@@ -1,24 +1,63 @@
- /*HA-DateTimePicker v1.1 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
+ /*HA-DateTimePicker v1.2 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
 
  function HaDateTimePicker(selector, options) {
-     this.solarDate = new HaSolarDate();
      this.target = selector;
      options = options || {};
      var isSolar = options.isSolar ? options.isSolar.toString().toLowerCase() === "true" ? true : false : false;
+     var isLunar = options.isLunar ? options.isLunar.toString().toLowerCase() === "true" ? true : false : false;
+
+     if (typeof options.selectedDate === 'string' || options.selectedDate instanceof String) {
+         options.selectedDate = Date.parse(options.selectedDate).toString() !== "NaN" ? options.resultInSolar === "true" ? new HaSolarDate(options.selectedDate) : new Date(options.selectedDate) : null;
+     }
+
      this.options = {
          date: options.date || new Date(),
          isSolar: isSolar,
-         maxYear: options.maxYear || isSolar === true ? 1450 : 2050,
-         minYear: options.minYear || isSolar === true ? 1350 : 1950,
+         isLunar: isLunar,
+         maxYear: options.maxYear || isSolar === true ? 1450 : isLunar === true ? 1380 : 2050,
+         minYear: options.minYear || isSolar === true ? 1350 : isLunar === true ? 1480 : 1950,
          pagingDuration: options.pagingDuration || 600,
          selectedDate: options.selectedDate || null,
          minAllowedDate: options.minAllowedDate || null,
          maxAllowedDate: options.maxAllowedDate || null,
          forceSetTime: options.forceSetTime ? options.forceSetTime.toString().toLowerCase() === "true" ? true : false : false,
          resultInSolar: options.resultInSolar ? options.resultInSolar.toString().toLowerCase() === "true" ? true : false : false,
+         resultInLunar: options.resultInLunar ? options.resultInLunar.toString().toLowerCase() === "true" ? true : false : false,
          disableTime: options.disableTime ? options.disableTime.toString().toLowerCase() === "true" ? true : false : false,
-         resultFormat: options.resultFormat || "{month}/{day}/{year} {t?{hour}:{minute} {ampm}}"
+         resultFormat: options.resultFormat || "{month}/{day}/{year} {t?{hour}:{minute} {ampm}}",
+         disabledWeekDays: options.disabledWeekDays || null
      };
+
+     if (this.options.disabledWeekDays) {
+         if (this.options.disabledWeekDays.constructor !== Array || !(this.options.disabledWeekDays instanceof Array) || this)
+             this.options.disabledWeekDays = this.options.disabledWeekDays.split(',');
+
+         for (var wd = 0; wd < this.options.disabledWeekDays.length; wd++) {
+             this.options.disabledWeekDays[wd] = Number(this.options.disabledWeekDays[wd].toString());
+             if (this.options.disabledWeekDays[wd] == 7)
+                 this.options.disabledWeekDays.push(0);
+         }
+     }
+     if (typeof HaSolarDate === "undefined") {
+         this.options.isSolar = false;
+         this.options.resultInSolar = false;
+     } else {
+         this.solarDate = new HaSolarDate();
+
+     }
+
+     if (typeof HaLunarDate === "undefined") {
+         this.options.isLunar = false;
+         this.options.resultInLunar = false;
+     } else {
+         this.lunarDate = new HaLunarDate();
+     }
+
+     if (this.options.isSolar)
+         window.HaDateSource = HaSolarDate;
+     else if (this.options.isLunar)
+         window.HaDateSource = HaLunarDate;
+     else window.HaDateSource = Date;
 
      if (this.options.selectedDate != null)
          this.selectedTime = {
@@ -26,13 +65,19 @@
              minute: this.options.selectedDate.getMinutes(),
              amOrPm: this.options.selectedDate.getHours() >= 12 ? "pm" : "am"
          };
-
-     if (this.options.isSolar === true) {
+     if (this.options.isLunar === true) {
+         this.days = this.lunarDate.dayNames;
+         this.monthNames = this.lunarDate.monthNames;
+         this.renderedDate = this.lunarDate.convertFromGregorian(this.options.date);
+         if (this.options.selectedDate != null)
+             this.selectedDate = this.options.resultInLunar === false ? this.lunarDate.convertFromGregorian(this.options.selectedDate) :
+             new HaLunarDate(this.options.selectedDate.getFullYear(), this.options.selectedDate.getMonth(), this.options.selectedDate.getDate());
+     } else if (this.options.isSolar === true) {
          this.days = this.solarDate.dayNames;
          this.monthNames = this.solarDate.monthNames;
          this.renderedDate = this.solarDate.convertFromGregorian(this.options.date);
          if (this.options.selectedDate != null)
-             this.selectedDate = this.options.resultInSolar === false ? this.solarDate.convertToGregorian(this.options.selectedDate) :
+             this.selectedDate = this.options.resultInSolar === false ? this.solarDate.convertFromGregorian(this.options.selectedDate) :
              new HaSolarDate(this.options.selectedDate.getFullYear(), this.options.selectedDate.getMonth(), this.options.selectedDate.getDate());
      } else {
          this.renderedDate = this.options.date;
@@ -47,27 +92,23 @@
      }
 
      if (this.options.maxAllowedDate) {
-         this.options.maxAllowedDate = this.options.isSolar ? new HaSolarDate(this.options.maxAllowedDate) : new Date(this.options.maxAllowedDate);
+         this.options.maxAllowedDate = this.options.isSolar ? new HaSolarDate(this.options.maxAllowedDate) : this.options.isLunar ? new HaLunarDate(this.options.maxAllowedDate) : new Date(this.options.maxAllowedDate);
          this.options.maxYear = Math.min(this.options.maxYear, this.options.maxAllowedDate.getFullYear());
          if (this.solarDate.compare(this.options.maxAllowedDate, this.renderedDate) > 0)
              this.renderedDate = this.options.maxAllowedDate;
      }
 
      if (this.options.minAllowedDate) {
-         this.options.minAllowedDate = this.options.isSolar ? new HaSolarDate(this.options.minAllowedDate) : new Date(this.options.minAllowedDate);
+         this.options.minAllowedDate = this.options.isSolar ? new HaSolarDate(this.options.minAllowedDate) : this.options.isLunar ? new HaLunarDate(this.options.minAllowedDate) : new Date(this.options.minAllowedDate);
          this.options.minYear = Math.max(this.options.minYear, this.options.minAllowedDate.getFullYear());
          if (this.solarDate.compare(this.options.minAllowedDate, this.options.renderedDate) < 0)
              this.renderedDate = this.options.minAllowedDate;
      }
 
-
-
-
      if (this.options.disableTime === true) {
          this.options.forceSetTime = false;
          this.selectedTime = null;
      }
-
 
  }
 
@@ -75,6 +116,34 @@
      if (document.querySelectorAll(".ha-datetimepicker").length > 0) {
          document.body.removeChild(document.querySelector(".ha-datetimepicker"));
      }
+
+     if (this.options.isSolar)
+         window.HaDateSource = HaSolarDate;
+     else if (this.options.isLunar)
+         window.HaDateSource = HaLunarDate;
+     else window.HaDateSource = Date;
+
+     function toArabicDigit() {
+         return this.replace(/\d+/g, function(digits) {
+             var result = "";
+             for (var i = 0; i < digits.length; i++) {
+                 result += String.fromCharCode(digits.charCodeAt(i) + 1584);
+             }
+             return result;
+         });
+     };
+
+     function toPersianDigit() {
+         return this.replace(/\d+/g, function(digits) {
+             var result = "";
+             for (var i = 0; i < digits.length; i++) {
+                 result += String.fromCharCode(digits.charCodeAt(i) + 1728);
+             }
+             return result;
+         });
+     };
+
+     String.prototype.toLocalDigit = this.options.isSolar ? toPersianDigit : toArabicDigit;
 
      this.createCalendar();
      this.setupStyles();
@@ -90,9 +159,9 @@
  }
 
  HaDateTimePicker.prototype.createCalendar = function() {
-     var currentYearDisp = this.options.isSolar == true ? this.renderedDate.getFullYear().toString().toFaDigit() : this.renderedDate.getFullYear();
+     var currentYearDisp = this.options.isSolar || this.options.isLunar ? this.renderedDate.getFullYear().toString().toLocalDigit() : this.renderedDate.getFullYear();
 
-     var lang = this.options.isSolar ? "fa" : "en";
+     var lang = this.options.isSolar ? "fa" : this.options.isLunar ? "ar" : "en";
      var html = "<div class='ha-datetimepicker " + lang + "'><div class='ha-dp-dim'></div><div class='ha-datetimepicker-container'>" +
          "<div class='ha-dp-header'>" +
          "<div class='ha-dp-year'>" +
@@ -102,7 +171,7 @@
      for (var y = this.options.minYear; y <= this.options.maxYear; y++) {
          if (y % 10 == 0)
              html += "<hr class='ha-dp-list-separator'/>";
-         var yearDisp = this.options.isSolar == true ? y.toString().toFaDigit() : y;
+         var yearDisp = this.options.isSolar || this.options.isLunar ? y.toString().toLocalDigit() : y;
          html += "<li class='ha-dp-year-item' data-year='" + y + "'>" + yearDisp + "</li>";
      }
      html += "</ul>" + //end of ul.ha-dp-year-dropdown
@@ -169,14 +238,15 @@
      var c = document.querySelector(".ha-dp-days-container");
      c.setAttribute("style", "animation-duration:" + this.options.pagingDuration + "ms");
 
-     if (this.options.isSolar) {
+     if (this.options.isSolar || this.options.isLunar) {
          var dp = document.querySelector(".ha-dp-body");
          dp.style.direction = "rtl";
      }
  }
 
  HaDateTimePicker.prototype.renderDate = function(date) {
-     this.renderedDate = this.options.isSolar ? new HaSolarDate(date) : new Date(date);
+     //  this.renderedDate = this.options.isSolar ? new HaSolarDate(date) : new Date(date);
+     this.renderedDate = new HaDateSource(date);
      this.renderedDate.setDate(1);
 
      var weeks = [{
@@ -193,13 +263,15 @@
      var currentDate;
      var tempDate;
 
-     if (this.options.isSolar == true) {
-         tempDate = new HaSolarDate(date.getFullYear(), date.getMonth(), 1);
-         currentDate = new HaSolarDate();
-     } else {
-         tempDate = new Date(date.getFullYear(), date.getMonth(), 1);
-         currentDate = new Date();
-     }
+     //  if (this.options.isSolar == true) {
+     //      tempDate = new HaSolarDate(date.getFullYear(), date.getMonth(), 1);
+     //      currentDate = new HaSolarDate();
+     //  } else {
+     //      tempDate = new Date(date.getFullYear(), date.getMonth(), 1);
+     //      currentDate = new Date();
+     //  }
+     tempDate = new HaDateSource(date.getFullYear(), date.getMonth(), 1);
+     currentDate = new HaDateSource();
      var c = -tempDate.getDay() + 1;
 
      for (var w = 1; w <= 6; w++) {
@@ -213,7 +285,7 @@
      }
 
      var yearBtn = document.querySelector(".ha-dp-year-btn");
-     yearBtn.innerHTML = this.options.isSolar === true ? date.getFullYear().toString().toFaDigit() : date.getFullYear();
+     yearBtn.innerHTML = this.options.isSolar || this.options.isLunar ? date.getFullYear().toString().toLocalDigit() : date.getFullYear();
      var yearItems = document.getElementsByClassName("ha-dp-year-item");
 
      for (var yi = 0; yi < yearItems.length; yi++) {
@@ -228,11 +300,14 @@
      monthBtn.innerHTML = this.monthNames[date.getMonth()];
 
      var daysContainer = document.querySelector(".ha-dp-days-container");
-
-     var monthLastDay = this.options.isSolar === false ? getMonthLastDay(date.getMonth(), date.getFullYear()) : this.solarDate.getMonthTotalDays(date.getMonth(), date.getFullYear());
-     var previousMonthLastDay = this.options.isSolar === false ? getMonthLastDay(date.getMonth() - 1, date.getFullYear()) : this.solarDate.getMonthTotalDays(date.getMonth() - 1, date.getFullYear());
-
+     var tempHaDateSource = new HaDateSource();
+     //  var monthLastDay = this.options.isSolar === false ? getMonthLastDay(date.getMonth(), date.getFullYear()) : this.solarDate.getMonthTotalDays(date.getMonth(), date.getFullYear());
+     var monthLastDay = tempHaDateSource.getMonthTotalDays(date.getMonth(), date.getFullYear());
+     //  var previousMonthLastDay = this.options.isSolar === false ? getMonthLastDay(date.getMonth() - 1, date.getFullYear()) : this.solarDate.getMonthTotalDays(date.getMonth() - 1, date.getFullYear());
+     var previousMonthLastDay = tempHaDateSource.getMonthTotalDays(date.getMonth() - 1, date.getFullYear());
+     delete tempHaDateSource;
      var html = "";
+
      for (var x = 0; x < weeks.length; x++) {
          var h = "<div>";
          for (var l = 0; l < weeks[x].daysOfWeek.length; l++) {
@@ -248,22 +323,28 @@
                      muted = this.solarDate.compare(new Date(date.getFullYear(), date.getMonth(), dayOfMonth), this.options.minAllowedDate) > 0 ? " ha-dp-cell-muted" : muted;
                  if (this.options.maxAllowedDate != null)
                      muted = this.solarDate.compare(new Date(date.getFullYear(), date.getMonth(), dayOfMonth), this.options.maxAllowedDate) < 0 ? " ha-dp-cell-muted" : muted;
+                 if (this.options.disabledWeekDays != null) {
+                     var weekDay = this.options.isSolar || this.options.isLunar ? l : l + 1;
+
+                     if (this.options.disabledWeekDays.indexOf(weekDay) >= 0)
+                         muted = " ha-dp-cell-muted";
+                 }
 
                  var cd = currentDate.getFullYear() == date.getFullYear() && currentDate.getMonth() == date.getMonth() && currentDate.getDate() == dayOfMonth ? " ha-dp-cell-currentdate" : "";
                  var holiday;
-                 if (this.options.isSolar)
+                 if (this.options.isSolar || this.options.isLunar)
                      holiday = l == 6 ? " ha-dp-cell-holiday" : "";
                  else
                      holiday = l == 5 ? " ha-dp-cell-holiday" : "";
 
-                 var disp = this.options.isSolar == true ? dayOfMonth.toString().toFaDigit() : dayOfMonth;
+                 var disp = this.options.isSolar == true || this.options.isLunar ? dayOfMonth.toString().toLocalDigit() : dayOfMonth;
                  h += "<p class='ha-dp-cell" + holiday + cd + selected + muted + "' data-date='" + dayOfMonth + "' data-disp='" + disp + "'>" + disp + "</p>";
              } else
              if (dayOfMonth < 1) {
-                 var disp = this.options.isSolar == true ? (previousMonthLastDay + dayOfMonth).toString().toFaDigit() : (previousMonthLastDay + dayOfMonth);
+                 var disp = this.options.isSolar == true || this.options.isLunar ? (previousMonthLastDay + dayOfMonth).toString().toLocalDigit() : (previousMonthLastDay + dayOfMonth);
                  h += "<p class='ha-dp-cell ha-dp-cell-muted' data-date='" + (previousMonthLastDay + dayOfMonth) + "'>" + disp + "</p>";
              } else {
-                 var disp = this.options.isSolar == true ? (dayOfMonth - monthLastDay).toString().toFaDigit() : (dayOfMonth - monthLastDay);
+                 var disp = this.options.isSolar == true || this.options.isLunar ? (dayOfMonth - monthLastDay).toString().toLocalDigit() : (dayOfMonth - monthLastDay);
                  h += "<p class='ha-dp-cell ha-dp-cell-muted' data-date='" + (dayOfMonth - monthLastDay) + "'>" + disp + "</p>";
              }
 
@@ -288,6 +369,8 @@
      //         if (this.solarDate.compare(this.options.minAllowedDate, date) < 0)
      //             return;
      //     }
+
+
      var c = document.querySelector(".ha-dp-days-container");
      var delay = this.options.pagingDuration;
      c.className = c.className.replace("page-left", "").replace("page-right", "").trim();
@@ -300,10 +383,10 @@
 
      var self = this;
      setTimeout(function() {
-         if (self.options.isSolar)
-             self.renderDate(new HaSolarDate(date.getFullYear(), date.getMonth(), date.getDate()));
-         else
-             self.renderDate(new Date(date.getFullYear(), date.getMonth(), date.getDate()));
+         //  if (self.options.isSolar)
+         //      self.renderDate(new HaSolarDate(date.getFullYear(), date.getMonth(), date.getDate()));
+         //  else
+         self.renderDate(new HaDateSource(date.getFullYear(), date.getMonth(), date.getDate()));
      }, delay / 2);
 
      setTimeout(function() {
@@ -322,10 +405,10 @@
                  cells[c].className = cells[c].className.replace("ha-dp-cell-selected", "").trim();
              }
              this.className += " ha-dp-cell-selected";
-             if (self.options.isSolar)
-                 self.selectedDate = new HaSolarDate(self.renderedDate.getFullYear(), self.renderedDate.getMonth(), parseInt(this.getAttribute("data-date")));
-             else
-                 self.selectedDate = new Date(self.renderedDate.getFullYear(), self.renderedDate.getMonth(), parseInt(this.getAttribute("data-date")));
+             //  if (self.options.isSolar)
+             //      self.selectedDate = new HaSolarDate(self.renderedDate.getFullYear(), self.renderedDate.getMonth(), parseInt(this.getAttribute("data-date")));
+             //  else
+             self.selectedDate = new HaDateSource(self.renderedDate.getFullYear(), self.renderedDate.getMonth(), parseInt(this.getAttribute("data-date")));
              self.renderResult();
          }
      }
@@ -339,12 +422,15 @@
      var previous = document.querySelector(".ha-dp-prev-btn");
      next.onclick = function() {
          var year = self.renderedDate.getFullYear();
+
          var month = self.renderedDate.getMonth() + 1;
          if (month >= 12) {
              year++;
              month = 0;
          }
-         self.changeDate(new Date(year, month, currentDate.getDate()));
+         var nextDate = new HaDateSource(year, month, currentDate.getDate());
+
+         self.changeDate(nextDate);
      }
      previous.onclick = function() {
          var year = self.renderedDate.getFullYear();
@@ -354,10 +440,10 @@
              year--;
              month = 11;
          }
-         if (self.options.isSolar)
-             self.changeDate(new HaSolarDate(year, month, currentDate.getDate()));
-         else
-             self.changeDate(new Date(year, month, currentDate.getDate()));
+         //  if (self.options.isSolar)
+         self.changeDate(new HaDateSource(year, month, currentDate.getDate()));
+         //  else
+         //      self.changeDate(new Date(year, month, currentDate.getDate()));
      }
      var monthBtn = document.querySelector(".ha-dp-month-btn");
      var yearBtn = document.querySelector(".ha-dp-year-btn");
@@ -419,8 +505,9 @@
 
      var okBtn = document.querySelector(".ha-dp-ok-btn");
      okBtn.onclick = function() {
-         if (self.returnResults() != null)
+         if (self.returnResults() != null) {
              self.hide();
+         }
      }
      var cancelBtn = document.querySelector(".ha-dp-cancel-btn");
      cancelBtn.onclick = function() {
@@ -462,6 +549,8 @@
              isInsideHours = false;
          });
          hoursClockFace.onwheel = function(e) {
+             e.preventDefault();
+             e.stopPropagation();
              if (self.selectedTime == null)
                  return;
              var h = Number(self.selectedTime.hour);
@@ -477,6 +566,8 @@
          };
          var minutesClockFace = document.querySelector(".ha-dp-clock-face");
          minutesClockFace.onwheel = function(e) {
+             e.preventDefault();
+             e.stopPropagation();
              if (self.selectedTime == null || isInsideHours)
                  return;
              var m = Number(self.selectedTime.minute)
@@ -551,12 +642,12 @@
      var r = document.querySelector(".ha-dp-result");
      var res = "";
      if (this.selectedDate != null)
-         res = this.options.isSolar ? this.selectedDate.getDate() + "/" + (this.selectedDate.getMonth() + 1) + "/" + this.selectedDate.getFullYear() :
+         res = this.options.isSolar || this.options.isLunar ? this.selectedDate.getDate() + "/" + (this.selectedDate.getMonth() + 1) + "/" + this.selectedDate.getFullYear() :
          (this.selectedDate.getMonth() + 1) + "/" + this.selectedDate.getDate() + "/" + this.selectedDate.getFullYear();
      if (this.selectedTime != null)
          res += " " + twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes()) + " " + this.getAmOrPm().toUpperCase();
 
-     r.innerHTML = res == "" ? "-" : this.options.isSolar == false ? res : res.toFaDigit();
+     r.innerHTML = res == "" ? "-" : this.options.isSolar || this.options.isLunar ? res.toLocalDigit() : res;
  }
 
  HaDateTimePicker.prototype.renderHourHand = function() {
@@ -705,7 +796,9 @@
          this.toggleClock();
          return null;
      }
-     var targets = document.querySelectorAll(this.target);
+
+
+     var targets = this.target.nodeType ? [this.target] : document.querySelectorAll(this.target);
 
      var formattedResult = this.getFormatedResult();
 
@@ -723,13 +816,23 @@
 
  HaDateTimePicker.prototype.getResult = function() {
      var resultDate = this.selectedDate;
-     if (!this.options.resultInSolar && this.options.isSolar) {
-         resultDate = this.solarDate.convertToGregorian(new HaSolarDate(resultDate.getFullYear(), resultDate.getMonth(), resultDate.getDate()));
-     }
+     var tempHaDateSource = new HaDateSource();
+     if (this.options.isSolar || this.options.isLunar)
+         resultDate = tempHaDateSource.convertToGregorian(this.selectedDate);
 
-     if (!this.options.isSolar && this.options.resultInSolar) {
-         resultDate = this.solarDate.convertFromGregorian(new Date(resultDate.getFullYear(), resultDate.getMonth(), resultDate.getDate()));
+
+     if (this.options.resultInSolar || this.options.resultInLunar) {
+         var tempConvertor = this.options.resultInSolar ? this.solarDate : this.lunarDate;
+         resultDate = tempConvertor.convertFromGregorian(resultDate);
      }
+     delete tempHaDateSource;
+     //  if (!this.options.resultInSolar && this.options.isSolar) {
+     //      resultDate = this.solarDate.convertToGregorian(new HaSolarDate(resultDate.getFullYear(), resultDate.getMonth(), resultDate.getDate()));
+     //  }
+
+     //  if (!this.options.isSolar && this.options.resultInSolar) {
+     //      resultDate = this.solarDate.convertFromGregorian(new Date(resultDate.getFullYear(), resultDate.getMonth(), resultDate.getDate()));
+     //  }
 
      if (this.selectedTime != null) {
          resultDate.setHours(this.getHours());
@@ -792,6 +895,7 @@
      dp.className = dp.className.replace("show", "").trim();
  }
 
+ var dps = [];
  HaDateTimePicker.init = function() {
      var datePickers = document.querySelectorAll("[data-ha-datetimepicker]");
      for (var d = 0; d < datePickers.length; d++) {
@@ -802,27 +906,33 @@
              e.preventDefault();
              return false;
          });
+         var isSolar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-issolar");
+         var isLunar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-islunar");
+         var resultInSolar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-resultinsolar")
+         var resultInLunar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-resultinlunar")
+         var dp = new HaDateTimePicker(caseInsensitiveGetAttribute(datePickers[d], "data-ha-datetimepicker"), {
+             date: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-date"),
+             selectedDate: datePickers[d].value ? datePickers[d].value : datePickers[d].innerHTML ? datePickers[d].innerHTML : caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-selecteddate"),
+             minAllowedDate: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-minalloweddate"),
+             maxAllowedDate: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-maxalloweddate"),
+             pagingDuration: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-pagingduration"),
+             minYear: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-minyear"),
+             maxYear: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-maxyear"),
+             resultInSolar: resultInSolar,
+             resultInLunar: resultInLunar,
+             isSolar: isSolar,
+             isLunar: isLunar,
+             forceSetTime: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-forcesettime"),
+             disableTime: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-disabletime"),
+             resultFormat: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-resultformat"),
+             disabledWeekDays: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-disabledweekdays")
+         });
+         dps.push(dp);
+         datePickers[d].index = d;
          datePickers[d].addEventListener("click", function(e) {
              this.blur();
-             var isSolar = caseInsensitiveGetAttribute(this, "data-ha-dp-issolar");
-             var resultInSolar = caseInsensitiveGetAttribute(this, "data-ha-dp-resultinsolar")
-             var dp = new HaDateTimePicker(caseInsensitiveGetAttribute(this, "data-ha-datetimepicker"), {
-                 date: caseInsensitiveGetAttribute(this, "data-ha-dp-date"),
-                 selectedDate: this.value && Date.parse(this.value).toString() !== "NaN" ? resultInSolar === "true" ? new HaSolarDate(this.value) : new Date(this.value) : null ||
-                     this.innerHTML && Date.parse(this.innerHTML).toString() !== "NaN" ? resultInSolar === "true" ? new HaSolarDate(this.innerHTML) : new Date(this.innerHTML) : null ||
-                     caseInsensitiveGetAttribute(this, "data-ha-dp-selecteddate"),
-                 minAllowedDate: caseInsensitiveGetAttribute(this, "data-ha-dp-minalloweddate"),
-                 maxAllowedDate: caseInsensitiveGetAttribute(this, "data-ha-dp-maxalloweddate"),
-                 pagingDuration: caseInsensitiveGetAttribute(this, "data-ha-dp-pagingduration"),
-                 minYear: caseInsensitiveGetAttribute(this, "data-ha-dp-minyear"),
-                 maxYear: caseInsensitiveGetAttribute(this, "data-ha-dp-maxyear"),
-                 resultInSolar: resultInSolar,
-                 isSolar: isSolar,
-                 forceSetTime: caseInsensitiveGetAttribute(this, "data-ha-dp-forcesettime"),
-                 disableTime: caseInsensitiveGetAttribute(this, "data-ha-dp-disabletime"),
-                 resultFormat: caseInsensitiveGetAttribute(this, "data-ha-dp-resultformat")
-             });
-             dp.show();
+
+             dps[this.index].show();
          });
      }
  }
@@ -836,15 +946,6 @@
      }
  };
 
- String.prototype.toFaDigit = function() {
-     return this.replace(/\d+/g, function(digits) {
-         var result = "";
-         for (var i = 0; i < digits.length; i++) {
-             result += String.fromCharCode(digits.charCodeAt(i) + 1728);
-         }
-         return result;
-     });
- };
 
 
  String.prototype.indexOfAfter = function(preString, searchString) {
@@ -891,7 +992,15 @@
      return frag;
  }
 
- function getMonthLastDay(monthNumber, year) {
+ //  Date.prototype.getMonthLastDay = function(monthNumber, year) {
+ //      var date = new Date();
+ //      if (monthNumber + 1 > 11)
+ //          year++;
+ //      var lastDay = new Date(year, monthNumber + 1, 0).getDate();
+ //      return lastDay;
+ //  }
+
+ Date.prototype.getMonthTotalDays = function(monthNumber, year) {
      var date = new Date();
      if (monthNumber + 1 > 11)
          year++;

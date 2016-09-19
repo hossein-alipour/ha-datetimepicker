@@ -1,14 +1,22 @@
- /*HA-DateTimePicker v1.1 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
+ /*HA-DateTimePicker v1.2 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
+ 
  @font-face {
      font-family: Yekan;
-     src: url(ha-dp-fonts/Yekan.eot?#) format('eot'), url(ha-dp-fonts/Yekan.woff) format('woff'), url(ha-dp-fonts/Yekan.otf) format('opentype'), url(ha-dp-fonts/Yekan.ttf) format('truetype'), url(ha-dp-fonts/Yekan.svg) format('svg');
+     src: url(ha-dp-fonts/Yekan.woff) format('woff');
      font-weight: normal;
      font-style: normal;
  }
-
+ 
+ @font-face {
+     font-family: 'DIN NEXTTM ARABIC';
+     src: url('ha-dp-fonts/subset-DINNextLTW23-Regular.woff2') format('woff2'), url('ha-dp-fonts/subset-DINNextLTW23-Regular.woff') format('woff');
+     font-weight: normal;
+     font-style: normal;
+ }
+ 
  @font-face {
      font-family: Roboto;
-     src: url(ha-dp-fonts/Roboto-Regular.woff) format('woff'), url(ha-dp-fonts/Roboto-Regular.woff2) format('woff2'), url(ha-dp-fonts/Roboto-Regular.ttf) format('truetype');
+     src: url(ha-dp-fonts/Roboto-Regular.woff) format('woff'), url(ha-dp-fonts/Roboto-Regular.woff2) format('woff2');
      font-weight: normal;
      font-style: normal;
  }
@@ -38,6 +46,11 @@
  .ha-datetimepicker.fa,
  .ha-datetimepicker.fa * {
      font-family: Yekan, sans-serif !important;
+ }
+ 
+ .ha-datetimepicker.ar,
+ .ha-datetimepicker.ar * {
+     font-family: 'DIN NEXTTM ARABIC', sans-serif !important;
  }
  
  .ha-dp-dim {
@@ -371,7 +384,7 @@
  }
  
  .ha-dp-cell.ha-dp-cell-muted.ha-dp-cell.ha-dp-cell-holiday {
-     color: #cecece;
+     color: #bc938a;
  }
  
  .ha-dp-cell.ha-dp-cell-currentdate {
@@ -514,7 +527,7 @@
      z-index: 2;
  }
  
- .ha-datetimepicker.clock .ha-dp-clock {
+ .ha-datetimepicker.show.clock .ha-dp-clock {
      pointer-events: all;
      -webkit-transform: scale(1);
      -moz-transform: scale(1);
@@ -655,7 +668,7 @@
      transition: all .2s;
  }
  
- .ha-datetimepicker.clock .ha-dp-clock .ha-dp-clock-num .num {
+ .ha-datetimepicker.show.clock .ha-dp-clock .ha-dp-clock-num .num {
      pointer-events: all;
  }
  

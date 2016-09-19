@@ -1,4 +1,4 @@
- /*HA-SolarDate v1.1 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
+ /*HA-SolarDate v1.2 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
 
  function HaSolarDate(year, month, day, hour, minute, second) {
      if ((year instanceof String || typeof year === 'string') && year.indexOf("/") > -1) {
@@ -15,15 +15,16 @@
 
          if (date != null) {
              var dateValues = date.split("/");
-             this.month = dateValues[0];
+             this.month = Number(dateValues[0]) - 1;
              this.day = dateValues[1];
              this.year = dateValues[2];
          }
 
          if (time != null) {
-             var timeValues = date.split(":");
-             this.hour = values[0];
-             this.minute = values[1];
+             var timeValues = time.split(":");
+             this.hour = timeValues[0];
+             this.minute = timeValues[1];
+
              if (ampm != null) {
                  if (ampm.toLowerCase() == "pm")
                      this.hour += 12;
@@ -136,7 +137,7 @@
  }
 
  HaSolarDate.prototype.toString = function() {
-     return this.dayNames[this.getDay()] + " " + this.getDate() + " " + this.monthNames[this.getMonth()] + " " + this.getFullYear();
+     return this.dayNames[this.getDay()] + " " + this.getDate() + " " + this.monthNames[this.getMonth()] + " " + this.getFullYear() + " " + this.getHours() + ":" + this.getMinutes();
  }
 
  HaSolarDate.prototype.getDayOfWeekName = function(day) {
@@ -290,6 +291,7 @@
  //6، 22، 17، 13، 9، 5، 1 و 30
  //1, 5, 9, 13, 17, 22, 26, 30
  HaSolarDate.prototype.isLeapYear = function(year) {
+     year = year || this.getFullYear();
      if (year % 33 == 26 ||
          year % 33 == 22 ||
          year % 33 == 17 ||
