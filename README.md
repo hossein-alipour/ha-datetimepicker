@@ -32,7 +32,7 @@ JS Files:
 
 CSS File:
 ```
-<link rel="stylesheet" type="text/css" href="h-datetimepicker.css" />
+<link rel="stylesheet" type="text/css" href="ha-datetimepicker.css" />
 ```
 
 # NuGet Package
