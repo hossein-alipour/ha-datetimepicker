@@ -1,0 +1,22 @@
+{
+  "name": "ha-datetimepicker",
+  "authors": [
+    "hossein-alipour <alipour.hossein69@hotmail.com>"
+  ],
+  "description": "A Solar, Lunar and Gregorian supported Date and Time picker with clean and nice UI and easy to use",
+  "main": "src\\ha-datetimepicker.js",
+  "keywords": [
+    "lunardate",
+    "solarcalendar",
+    "gregoriancalendar",
+    "calendar",
+    "javascript",
+    "shamsidate",
+    "solardate",
+    "datetimepicker",
+    "timepicker",
+    "datepicker"
+  ],
+  "license": "MIT",
+  "homepage": "http://demos.hosseinalipour.ir/ha-datetimepicker"
+}
