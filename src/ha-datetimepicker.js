@@ -93,14 +93,14 @@
      if (this.options.maxAllowedDate) {
          this.options.maxAllowedDate = this.options.isSolar ? new HaSolarDate(this.options.maxAllowedDate) : this.options.isLunar ? new HaLunarDate(this.options.maxAllowedDate) : new Date(this.options.maxAllowedDate);
          this.options.maxYear = Math.min(this.options.maxYear, this.options.maxAllowedDate.getFullYear());
-         if (this.solarDate.compare(this.options.maxAllowedDate, this.renderedDate) > 0)
+         if (this.options.date.compare(this.options.maxAllowedDate, this.renderedDate) > 0)
              this.renderedDate = this.options.maxAllowedDate;
      }
 
      if (this.options.minAllowedDate) {
          this.options.minAllowedDate = this.options.isSolar ? new HaSolarDate(this.options.minAllowedDate) : this.options.isLunar ? new HaLunarDate(this.options.minAllowedDate) : new Date(this.options.minAllowedDate);
          this.options.minYear = Math.max(this.options.minYear, this.options.minAllowedDate.getFullYear());
-         if (this.solarDate.compare(this.options.minAllowedDate, this.options.renderedDate) < 0)
+         if (this.options.date.compare(this.options.minAllowedDate, this.options.renderedDate) < 0)
              this.renderedDate = this.options.minAllowedDate;
      }
 
@@ -319,9 +319,9 @@
 
                  var muted = "";
                  if (this.options.minAllowedDate != null)
-                     muted = this.solarDate.compare(new Date(date.getFullYear(), date.getMonth(), dayOfMonth), this.options.minAllowedDate) > 0 ? " ha-dp-cell-muted" : muted;
+                     muted = this.options.date.compare(new Date(date.getFullYear(), date.getMonth(), dayOfMonth), this.options.minAllowedDate) > 0 ? " ha-dp-cell-muted" : muted;
                  if (this.options.maxAllowedDate != null)
-                     muted = this.solarDate.compare(new Date(date.getFullYear(), date.getMonth(), dayOfMonth), this.options.maxAllowedDate) < 0 ? " ha-dp-cell-muted" : muted;
+                     muted = this.options.date.compare(new Date(date.getFullYear(), date.getMonth(), dayOfMonth), this.options.maxAllowedDate) < 0 ? " ha-dp-cell-muted" : muted;
                  if (this.options.disabledWeekDays != null) {
                      var weekDay = this.options.isSolar || this.options.isLunar ? l : l + 1;
 
@@ -358,14 +358,14 @@
 
  HaDateTimePicker.prototype.changeDate = function(date) {
      // if (this.options.maxAllowedDate)
-     //     if (this.solarDate.compare(this.renderedDate, date) > 0) {
-     //         if (this.solarDate.compare(this.options.maxAllowedDate, date) > 0)
+     //     if (this.options.date.compare(this.renderedDate, date) > 0) {
+     //         if (this.options.date.compare(this.options.maxAllowedDate, date) > 0)
      //             return;
      //     }
 
      // if (this.options.minAllowedDate)
-     //     if (this.solarDate.compare(this.renderedDate, date) < 0) {
-     //         if (this.solarDate.compare(this.options.minAllowedDate, date) < 0)
+     //     if (this.options.date.compare(this.renderedDate, date) < 0) {
+     //         if (this.options.date.compare(this.options.minAllowedDate, date) < 0)
      //             return;
      //     }
 
@@ -373,7 +373,7 @@
      var c = document.querySelector(".ha-dp-days-container");
      var delay = this.options.pagingDuration;
      c.className = c.className.replace("page-left", "").replace("page-right", "").trim();
-     if (this.solarDate.compare(date, this.renderedDate) == -1)
+     if (this.options.date.compare(date, this.renderedDate) == -1)
          c.className += " page-left";
      else
          c.className += " page-right";
@@ -1005,6 +1005,40 @@
          year++;
      var lastDay = new Date(year, monthNumber + 1, 0).getDate();
      return lastDay;
+ }
+
+ Date.prototype.compare = function(date1, date2) {
+     if (date1 == null)
+         return 0;
+     if (date2 == null) {
+         date2 = date1;
+         date1 = this;
+     }
+
+     if (date1.getFullYear() > date2.getFullYear())
+         return -1;
+     else {
+         if (date1.getFullYear() < date2.getFullYear())
+             return 1;
+         else {
+             if (date1.getMonth() > date2.getMonth())
+                 return -1;
+             else {
+                 if (date1.getMonth() < date2.getMonth())
+                     return 1;
+                 else {
+                     if (date1.getDate() > date2.getDate())
+                         return -1;
+                     else {
+                         if (date1.getDate() < date2.getDate())
+                             return 1;
+                         else
+                             return 0;
+                     }
+                 }
+             }
+         }
+     }
  }
 
  HaDateTimePicker.init();

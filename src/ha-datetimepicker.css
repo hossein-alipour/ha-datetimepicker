@@ -34,6 +34,7 @@
      opacity: 0;
      -webkit-transition: all .3s ease-out;
      -moz-transition: all .3s ease-out;
+     -ms-transition: all .3s ease-out;
      -o-transition: all .3s ease-out;
      transition: all .3s ease-out;
  }
@@ -53,7 +54,7 @@
      font-family: 'DIN NEXTTM ARABIC', sans-serif !important;
  }
  
- .ha-dp-dim {
+ .ha-datetimepicker .ha-dp-dim {
      position: fixed;
      background-color: #000000;
      background-color: rgba(0, 0, 0, .1);
@@ -62,10 +63,20 @@
      right: 0;
      bottom: 0;
      height: 100%;
+     opacity: 0;
+     -webkit-transition: all .3s ease-out;
+     -moz-transition: all .3s ease-out;
+     -ms-transition: all .3s ease-out;
+     -o-transition: all .3s ease-out;
+     transition: all .3s ease-out;
  }
  
  .ha-datetimepicker.show {
      pointer-events: all;
+     opacity: 1;
+ }
+ 
+ .ha-datetimepicker.show .ha-dp-dim {
      opacity: 1;
  }
  
@@ -89,6 +100,7 @@
      opacity: 0;
      z-index: 1000;
      min-width: max-content;
+     min-width: -moz-fit-content;
      direction: ltr;
      top: 50%;
      left: 50%;
