@@ -21,7 +21,7 @@ v1.2
 
 v1.1
  - Added Max an Min Allowed Date: choose the maximum and minimum date that the user can select 
- - DateTimePicker will now close when clicking outsite of it
+ - DateTimePicker will now close when clicking outside of it
  - Added Result format: display date and time in any format you want
  - Minor Improvements
  - Minor bug fixes
