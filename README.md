@@ -4,6 +4,14 @@ A date and time picker with Solar(Persian), Lunar(Arabic) and Gregorian calendar
 ##View [Documentation and Demos](http://demos.hosseinalipour.ir/ha-datetimepicker)
 
 # Changelog
+v1.3
+ - The HA-DateTimePicker is now fully responsive
+ - Added feature of disabling ok button
+ - Added feature of extra targets
+ - Added Timepicker only mode
+ - Minor Improvements
+ - Minor bug fixes
+
 v1.2
  - Added Lunar Date (هجری قمری)
  - Added feature of changing hour and minute via mouse wheel
