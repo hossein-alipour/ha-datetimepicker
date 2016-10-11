@@ -145,7 +145,7 @@
  }
 
  HaLunarDate.prototype.toString = function() {
-     return this.dayNames[this.getDay()] + " " + this.getDate() + " " + this.monthNames[this.getMonth()] + " " + this.getFullYear();
+     return this.dayNames[this.getDay()] + " " + this.getDate() + " " + this.monthNames[this.getMonth()] + " " + this.getFullYear() + " " + this.getHours() + ":" + this.getMinutes();
  }
 
  HaLunarDate.prototype.getDayOfWeekName = function(day) {
