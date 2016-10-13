@@ -1,4 +1,4 @@
- /*HA-DateTimePicker v1.2 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
+ /*HA-DateTimePicker v1.3 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
 
  function HaDateTimePicker(selector, options) {
      this.target = selector;

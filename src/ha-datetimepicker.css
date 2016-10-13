@@ -1,4 +1,4 @@
- /*HA-DateTimePicker v1.2 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
+ /*HA-DateTimePicker v1.3 � 2016 by Hossein Alipour http://hosseinalipour.ir*/
  
  @font-face {
      font-family: Yekan;
@@ -104,7 +104,7 @@
      -o-transform: translate(-50%, -50%) scale(1.05);
      transform: translate(-50%, -50%) scale(1.05);
      opacity: 0;
-     z-index: 1000;
+     z-index: 9999;
      min-width: max-content;
      min-width: -moz-fit-content;
      direction: ltr;
@@ -818,7 +818,7 @@
      pointer-events: none;
  }
  
- @media(max-height: 510px) {
+ @media(max-height: 767px) {
      .ha-datetimepicker-container {
          width: 510px;
      }
