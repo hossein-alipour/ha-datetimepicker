@@ -105,5 +105,5 @@ disabledWeekDays | data-ha-dp-disabledweekdays | Array or String(separated by co
 
 
 ***
-Copyright © 2016 by [Hossein Alipour](http://hosseinalipour.ir)
+Copyright © 2016 by [Hossein Alipour](http://hosseinalipour.ir) under [MIT License](https://opensource.org/licenses/MIT)
 
