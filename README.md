@@ -1,3 +1,5 @@
+[![Wercker](https://img.shields.io/wercker/ci/wercker/docs.svg)](http://demos.hosseinalipour.ir/ha-datetimepicker)
+
 # HA-DateTimePicker
 A date and time picker with Solar(Persian), Lunar(Arabic) and Gregorian calendars
 
