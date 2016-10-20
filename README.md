@@ -1,4 +1,3 @@
-[![Wercker](https://img.shields.io/wercker/ci/wercker/docs.svg)](http://demos.hosseinalipour.ir/ha-datetimepicker)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](http://demos.hosseinalipour.ir/ha-datetimepicker)
 
 # HA-DateTimePicker
