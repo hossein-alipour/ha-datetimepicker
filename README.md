@@ -7,7 +7,7 @@ A date and time picker with Solar(Persian), Lunar(Arabic) and Gregorian calendar
 
 # Changelog
 v1.4
- - Addet events to control HA-DateTimePicker behaviour
+ - Added events to control HA-DateTimePicker behaviour
 
 v1.3
  - The HA-DateTimePicker is now fully responsive
