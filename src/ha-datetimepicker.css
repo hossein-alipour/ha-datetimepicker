@@ -436,8 +436,8 @@
      -o-transform: scale(1.2);
      transform: scale(1.2);
      border-radius: 2px;
-     box-shadow: 0 8px 17px 0 #000000, 0 6px 20px 0 #000000;
-     box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.16), 0 6px 20px 0 rgba(0, 0, 0, 0.15);
+     box-shadow: 0 8px 17px 0 #00bfff, 0 6px 20px 0 #00bfff;
+     box-shadow: 0 8px 17px 0 rgba(0, 191, 255, 0.26), 0 6px 20px 0 rgba(0, 191, 255, 0.25);
  }
  
  .ha-dp-cell:after {
@@ -818,7 +818,7 @@
      pointer-events: none;
  }
  
- @media(max-height: 767px) {
+ @media(max-height: 517px) {
      .ha-datetimepicker-container {
          width: 510px;
      }
@@ -869,6 +869,25 @@
          padding: 10px;
          float: right;
      }
+ }
+ 
+ .ha-datetimepicker.no-anim,
+ .ha-datetimepicker.no-anim .ha-dp-dim,
+ .ha-datetimepicker.no-anim .ha-datetimepicker-container,
+ .ha-datetimepicker.no-anim .ha-dp-clock-btn,
+ .ha-datetimepicker.no-anim .ha-dp-cell,
+ .ha-datetimepicker.no-anim .ha-dp-year-dropdown,
+ .ha-datetimepicker.no-anim .ha-dp-month-dropdown,
+ .ha-datetimepicker.no-anim .ha-dp-cell:before,
+ .ha-datetimepicker.no-anim .ha-dp-days-container,
+ .ha-datetimepicker.no-anim .ha-dp-clock,
+ .ha-datetimepicker.no-anim .ha-dp-clock-ampm-btn:after,
+ .ha-datetimepicker.no-anim .ha-dp-clock-am-btn,
+ .ha-datetimepicker.no-anim .ha-dp-clock-pm-btn,
+ .ha-datetimepicker.no-anim .ha-dp-clock-hour-hand,
+ .ha-datetimepicker.no-anim .ha-dp-clock-minute-hand {
+     animation: none;
+     transition: none;
  }
  /*********************************************************************************************************/
  /**********Uncomment this animation and comment the animation below to change paging animation************/

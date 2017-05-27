@@ -5,7 +5,11 @@
      options = options || {};
      var isSolar = options.isSolar ? options.isSolar.toString().toLowerCase() === "true" ? true : false : false;
      var isLunar = options.isLunar ? options.isLunar.toString().toLowerCase() === "true" ? true : false : false;
-
+     this.dpDOM = null;
+     this.eventHandler = document.createElement("DIV");
+     this.uId = "hadp" + Math.floor((1 + Math.random()) * 0x10000)
+         .toString(16)
+         .substring(1) + new Date().getSeconds();
      var timePickerOnly = options.timePickerOnly ? options.timePickerOnly.toString().toLowerCase() === "true" ? true : false : false;
      if (typeof options.selectedDate === 'string' || options.selectedDate instanceof String) {
          options.selectedDate = Date.parse(options.selectedDate).toString() !== "NaN" ? options.resultInSolar === "true" ? new HaSolarDate(options.selectedDate) : new Date(options.selectedDate) : null;
@@ -28,6 +32,7 @@
          resultInSolar: options.resultInSolar ? options.resultInSolar.toString().toLowerCase() === "true" ? true : false : false,
          resultInLunar: options.resultInLunar ? options.resultInLunar.toString().toLowerCase() === "true" ? true : false : false,
          disableTime: options.disableTime ? options.disableTime.toString().toLowerCase() === "true" ? true : false : false,
+         disableAnimations: options.disableAnimations ? options.disableAnimations.toString().toLowerCase() === "true" ? true : false : false,
          timePickerOnly: timePickerOnly,
          disableOkButton: options.disableOkButton ? options.disableOkButton.toString().toLowerCase() === "true" ? true : false : false,
          resultFormat: options.resultFormat || (timePickerOnly ? "{hour}:{minute} {ampm}" : "{month}/{day}/{year} {t?{hour}:{minute} {ampm}}"),
@@ -36,6 +41,8 @@
 
      if (this.options.timePickerOnly)
          this.clock = true;
+     else
+         this.clock = false;
 
      if (this.options.disabledWeekDays) {
          if (this.options.disabledWeekDays.constructor !== Array || !(this.options.disabledWeekDays instanceof Array) || this)
@@ -155,6 +162,7 @@
 
      this.createCalendar();
      this.setupStyles();
+     this.createEvents();
      this.renderDate(this.selectedDate || this.renderedDate);
      this.renderClock();
      if (this.selectedTime != null) {
@@ -163,14 +171,16 @@
      }
      this.addEvents();
      this.renderResult();
-     var self = this;
  }
 
  HaDateTimePicker.prototype.createCalendar = function() {
      var currentYearDisp = this.options.isSolar || this.options.isLunar ? this.renderedDate.getFullYear().toString().toLocalDigit() : this.renderedDate.getFullYear();
      var clock = this.options.timePickerOnly ? "clock timePickerOnly" : "";
+     var noAnim = this.options.disableAnimations ? "no-anim" : "";
+     if (this.options.disableAnimations)
+         this.options.pagingDuration = 0;
      var lang = this.options.isSolar ? "fa" : this.options.isLunar ? "ar" : "en";
-     var html = "<div class='ha-datetimepicker " + clock + " " + lang + "'><div class='ha-dp-dim'></div><div class='ha-datetimepicker-container'>";
+     var html = "<div class='ha-datetimepicker " + noAnim + " " + clock + " " + lang + "' id='" + this.uId + "'><div class='ha-dp-dim'></div><div class='ha-datetimepicker-container'>";
      html += "<div class='ha-dp-header'>" +
          "<div class='ha-dp-year'>" +
          "<div class='ha-dp-year-dropdown-container'>" +
@@ -246,6 +256,7 @@
      html += "</div></div>"; //end of div.ha-datetimepicker
 
      var dom = createFragment(html);
+     this.dpDOM = dom;
      document.body.insertBefore(dom, document.body.childNodes[document.body.childNodes.length - 1]);
 
  }
@@ -361,6 +372,8 @@
 
      daysContainer.innerHTML = html;
      this.addEvents();
+     this.events.pageChanged.detail.isClock = self.clock;
+     this.eventHandler.dispatchEvent(this.events.pageChanged);
  }
 
  HaDateTimePicker.prototype.changeDate = function(date) {
@@ -372,8 +385,6 @@
      else
          c.className += " page-right";
 
-
-
      var self = this;
      setTimeout(function() {
          self.renderDate(new HaDateSource(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -384,11 +395,42 @@
      }, delay);
  }
 
+ HaDateTimePicker.prototype.createEvents = function() {
+     this.events = {
+         selectedDateChanged: new CustomEvent("selectedDateChanged", {
+             "detail": {
+                 selectedDate: this.getResult()
+             }
+         }),
+         selectedTimeChanged: new CustomEvent("selectedTimeChanged", {
+             "detail": {
+                 selectedTime: this.selectedTime
+             }
+         }),
+         pageChanged: new CustomEvent("pageChanged", {
+             "detail": {
+                 date: this.renderedDate
+             }
+         }),
+         clockToggled: new CustomEvent("clockToggled", {
+             "detail": {
+                 isClock: this.clock
+             }
+         }),
+         pickerShow: new CustomEvent("pickerShow"),
+         pickerHide: new CustomEvent("pickerHide")
+     }
+ }
+
+ HaDateTimePicker.prototype.addEventListener = function(eventName, func) {
+     this.eventHandler.addEventListener(eventName, func);
+ }
+
  HaDateTimePicker.prototype.addEvents = function() {
      var c = document.querySelector(".ha-dp-days-container");
      var currentDate = new Date();
      var self = this;
-     var cells = document.querySelectorAll(".ha-dp-cell:not(.ha-dp-cell-muted):not(.ha-dp-cell-header)");
+     var cells = document.querySelectorAll("#" + this.uId + " .ha-dp-cell:not(.ha-dp-cell-muted):not(.ha-dp-cell-header)");
      for (var i = 0; i < cells.length; i++) {
          cells[i].onclick = function() {
              for (var c = 0; c < cells.length; c++) {
@@ -396,6 +438,9 @@
              }
              this.className += " ha-dp-cell-selected";
              self.selectedDate = new HaDateSource(self.renderedDate.getFullYear(), self.renderedDate.getMonth(), parseInt(this.getAttribute("data-date")));
+             self.events.selectedDateChanged.detail.selectedDate = self.selectedDate;
+             self.eventHandler.dispatchEvent(self.events.selectedDateChanged);
+
              self.renderResult();
              if (self.options.disableOkButton) {
                  self.toggleClock();
@@ -624,6 +669,9 @@
      this.selectedTime.amOrPm = newTime.amOrPm != null ? newTime.amOrPm : this.selectedTime.amOrPm;
      this.renderMinuteHand();
      this.renderHourHand();
+
+     this.events.selectedTimeChanged.detail.selectedTime = this.selectedTime;
+     this.eventHandler.dispatchEvent(this.events.selectedTimeChanged);
  }
  HaDateTimePicker.prototype.toggleClock = function() {
      if (this.options.disableTime === true)
@@ -634,6 +682,8 @@
      else
          dp.className = dp.className.replace("clock", "").trim();
      this.clock = !this.clock;
+     this.events.clockToggled.detail.isClock = this.clock;
+     this.eventHandler.dispatchEvent(this.events.clockToggled);
      this.renderResult();
  }
  HaDateTimePicker.prototype.renderResult = function() {
@@ -734,6 +784,8 @@
      ampmBtn.classList.remove("pm");
      ampmBtn.classList.add(amPm);
      this.renderClockResult();
+     this.events.selectedTimeChanged.detail.selectedTime = this.selectedTime;
+     this.eventHandler.dispatchEvent(this.events.selectedTimeChanged);
  }
 
  HaDateTimePicker.prototype.getHours = function() {
@@ -942,8 +994,10 @@
 
  HaDateTimePicker.prototype.show = function() {
      this.init();
+     var self = this;
      setTimeout(function() {
          document.querySelector(".ha-datetimepicker").className += " show";
+         self.eventHandler.dispatchEvent(self.events.pickerShow);
      }, 10);
  }
 
@@ -951,6 +1005,7 @@
      var dp = document.querySelector(".ha-datetimepicker");
      dp.className = dp.className.replace("show", "").trim();
      this.clock = false;
+     this.eventHandler.dispatchEvent(this.events.pickerHide);
  }
 
  var dps = [];
@@ -988,7 +1043,8 @@
              timePickerOnly: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-timepickeronly"),
              resultFormat: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-resultformat"),
              disabledWeekDays: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-disabledweekdays"),
-             disableOkButton: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-disableokbutton")
+             disableOkButton: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-disableokbutton"),
+             disableAnimations: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-disableanimations")
          });
          dps.push(dp);
          datePickers[d].index = d;
