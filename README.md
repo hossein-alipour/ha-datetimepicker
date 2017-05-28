@@ -3,7 +3,7 @@
 # HA-DateTimePicker
 A date and time picker with Solar(Persian), Lunar(Arabic) and Gregorian calendars
 
-##View [Documentation and Demos](http://demos.hosseinalipour.ir/ha-datetimepicker)
+## View [Documentation and Demos](http://demos.hosseinalipour.ir/ha-datetimepicker)
 
 # Changelog
 v1.4
