@@ -3,6 +3,7 @@
  function HaDateTimePicker(selector, options) {
      this.target = selector;
      options = options || {};
+     var is24 = options.is24 ? options.is24.toString().toLowerCase() === "true" ? true : false : false;
      var isSolar = options.isSolar ? options.isSolar.toString().toLowerCase() === "true" ? true : false : false;
      var isLunar = options.isLunar ? options.isLunar.toString().toLowerCase() === "true" ? true : false : false;
      this.dpDOM = null;
@@ -17,6 +18,7 @@
 
      this.options = {
          date: options.date || new Date(),
+         is24: is24,
          isSolar: isSolar,
          isLunar: isLunar,
          maxYear: options.maxYear || (isSolar === true ? 1450 : isLunar === true ? 1480 : 2050),
@@ -35,7 +37,7 @@
          disableAnimations: options.disableAnimations ? options.disableAnimations.toString().toLowerCase() === "true" ? true : false : false,
          timePickerOnly: timePickerOnly,
          disableOkButton: options.disableOkButton ? options.disableOkButton.toString().toLowerCase() === "true" ? true : false : false,
-         resultFormat: options.resultFormat || (timePickerOnly ? "{hour}:{minute} {ampm}" : "{month}/{day}/{year} {t?{hour}:{minute} {ampm}}"),
+         resultFormat: options.is24 ? options.resultFormat || (timePickerOnly ? "{hour}:{minute}" : "{month}/{day}/{year} {t?{hour}:{minute}}") : options.resultFormat || (timePickerOnly ? "{hour}:{minute} {ampm}" : "{month}/{day}/{year} {t?{hour}:{minute} {ampm}}"),
          disabledWeekDays: options.disabledWeekDays || null
      };
 
@@ -75,11 +77,19 @@
      else window.HaDateSource = Date;
 
      if (this.options.selectedDate != null)
-         this.selectedTime = {
-             hour: this.options.selectedDate.getHours() >= 12 ? this.options.selectedDate.getHours() - 12 : this.options.selectedDate.getHours(),
-             minute: this.options.selectedDate.getMinutes(),
-             amOrPm: this.options.selectedDate.getHours() >= 12 ? "pm" : "am"
-         };
+     if (this.options.is24) {
+        this.selectedTime = {
+            hour: this.options.selectedDate.getHours(),
+            minute: this.options.selectedDate.getMinutes(),
+            amOrPm: this.options.selectedDate.getHours() >= 12 ? "pm" : "am"
+        };
+    } else {
+        this.selectedTime = {
+            hour: this.options.selectedDate.getHours() >= 12 ? this.options.selectedDate.getHours() - 12 : this.options.selectedDate.getHours(),
+            minute: this.options.selectedDate.getMinutes(),
+            amOrPm: this.options.selectedDate.getHours() >= 12 ? "pm" : "am"
+        };
+    }
      if (this.options.isLunar === true) {
          this.days = this.lunarDate.dayNames;
          this.monthNames = this.lunarDate.monthNames;
@@ -219,9 +229,12 @@
      html += "</div>"; //end of div.ha-dp-body
 
      if (this.options.disableTime === false) {
+        var type = '';
+        if (this.options.is24)
+            type = ' ds-none ';
          html += "<div class='ha-dp-clock'>" +
              "<div class='ha-dp-clock-header'>" +
-             "<div class='ha-dp-ampm'>" +
+             "<div class='ha-dp-ampm"+type+"'>" +
              "<div type='button' class='ha-dp-clock-am-btn" + (this.selectedTime && this.selectedTime.amOrPm.toLowerCase() == "am" || !this.selectedTime ? " selected" : "") + "'>AM</div>" +
              "<button type='button' class='ha-dp-clock-ampm-btn" + (this.selectedTime && this.selectedTime.amOrPm.toLowerCase() == "pm" ? " pm" : " am") + "'>AMPM</button>" +
              "<div type='button' class='ha-dp-clock-pm-btn" + (this.selectedTime && this.selectedTime.amOrPm.toLowerCase() == "pm" ? " selected" : "") + "'>PM</div>" +
@@ -666,10 +679,17 @@
              amOrPm: "AM"
          };
 
-     if (newTime.hour > 11)
-         newTime.hour = 0;
-     if (newTime.hour < 0)
-         newTime.hour = 11;
+         if (this.options.is24) {
+            if (newTime.hour > 23)
+                newTime.hour = 0;
+            if (newTime.hour < 0)
+                newTime.hour = 23;
+        } else {
+            if (newTime.hour > 11)
+                newTime.hour = 0;
+            if (newTime.hour < 0)
+                newTime.hour = 11;
+        }
 
      if (newTime.minute > 59)
          newTime.minute = 0;
@@ -702,10 +722,14 @@
      var r = document.querySelector(".ha-dp-result");
      var res = "";
      if (this.selectedDate != null)
-         res = this.options.isSolar || this.options.isLunar ? this.selectedDate.getDate() + "/" + (this.selectedDate.getMonth() + 1) + "/" + this.selectedDate.getFullYear() :
+         res = this.options.isSolar || this.options.isLunar ? this.selectedDate.getFullYear() + "/" + (this.selectedDate.getMonth() + 1) + "/" + this.selectedDate.getDate() :
          (this.selectedDate.getMonth() + 1) + "/" + this.selectedDate.getDate() + "/" + this.selectedDate.getFullYear();
      if (this.selectedTime != null)
-         res += " " + twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes()) + " " + this.getAmOrPm().toUpperCase();
+     if (this.options.is24) {
+        res += "   " + twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes());
+    } else {
+        res += "   " + twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes()) + " " + this.getAmOrPm().toUpperCase();
+    }
      r.innerHTML = res == "" ? "-" : this.options.isSolar || this.options.isLunar ? res.toLocalDigit() : res;
  }
 
@@ -728,7 +752,11 @@
      else
          hand = document.createElement("div");
      hand.className = "ha-dp-clock-hour-hand";
-     var rot = 180 + (n * 30) + (this.selectedTime.minute * .5);
+     if (this.options.is24) {
+        var rot = 180 + (n * 15)
+    } else {
+        var rot = 180 + (n * 30) + (this.selectedTime.minute * .5);
+    }
 
      hand.setAttribute("style", "-webkit-transform: rotateZ(" + rot + "deg);-moz-transform: rotateZ(" + rot + "deg);transform: rotateZ(" + rot + "deg);");
      if (lastHand == null)
@@ -767,7 +795,11 @@
      if (this.options.disableTime === true)
          return;
      var resHolder = document.querySelector(".ha-dp-clock-res");
-     resHolder.innerHTML = twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes()) + " " + this.getAmOrPm().toUpperCase();
+     if (this.options.is24) {
+        resHolder.innerHTML = twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes());
+    } else {
+        resHolder.innerHTML = twoDigits(this.getHours()) + ":" + twoDigits(this.getMinutes()) + " " + this.getAmOrPm().toUpperCase();
+    }
 
      if (this.options.disableOkButton) {
          this.returnResults();
@@ -802,8 +834,13 @@
 
  HaDateTimePicker.prototype.getHours = function() {
      var hour = this.selectedTime.hour;
-     if (this.selectedTime.amOrPm.toLowerCase() == "pm" && hour == 0)
-         hour = 12;
+     if (this.options.is24) {
+        if (this.selectedTime.hour == 24)
+            hour = 0;
+    } else {
+        if (this.selectedTime.amOrPm.toLowerCase() == "pm" && hour == 0)
+            hour = 12;
+    }
 
      return hour;
  }
@@ -821,21 +858,36 @@
          return;
      var clockFace = document.querySelector(".ha-dp-clock-face");
      var hoursClockFace = document.querySelector(".hours-clock-face");
-     for (var n = 0; n < 12; n++) {
-         var numContainer = document.createElement("div");
-         numContainer.className = "ha-dp-clock-num ha-dp-hour-num";
-         var num = document.createElement("span");
-         num.setAttribute("data-hour", n)
-         num.className = "num";
-         num.innerHTML = n == 0 ? 12 : n;
-         numContainer.appendChild(num);
+     if (this.options.is24) {
+        for (var n = 0; n < 24; n++) {
+            var numContainer = document.createElement("div");
+            numContainer.className = "ha-dp-clock-num ha-dp-hour-num";
+            var num = document.createElement("span");
+            num.setAttribute("data-hour", n)
+            num.className = "num";
+            num.innerHTML = n == 0 ? 0 : n;
+            numContainer.appendChild(num);
+            var rot = 180 + (n * 15);
+            numContainer.setAttribute("style", "-webkit-transform: rotateZ(" + rot + "deg);-moz-transform: rotateZ(" + rot + "deg);transform: rotateZ(" + rot + "deg);")
+            num.setAttribute("style", "-webkit-transform: rotateZ(" + -rot + "deg);-moz-transform: rotateZ(" + -rot + "deg);transform: rotateZ(" + -rot + "deg);")
+            clockFace.appendChild(numContainer);
+        }
+    } else {
+        for (var n = 0; n < 12; n++) {
+            var numContainer = document.createElement("div");
+            numContainer.className = "ha-dp-clock-num ha-dp-hour-num";
+            var num = document.createElement("span");
+            num.setAttribute("data-hour", n)
+            num.className = "num";
+            num.innerHTML = n == 0 ? 12 : n;
+            numContainer.appendChild(num);
 
-         var rot = 180 + (n * 30);
-         numContainer.setAttribute("style", "-webkit-transform: rotateZ(" + rot + "deg);-moz-transform: rotateZ(" + rot + "deg);transform: rotateZ(" + rot + "deg);")
-         num.setAttribute("style", "-webkit-transform: rotateZ(" + -rot + "deg);-moz-transform: rotateZ(" + -rot + "deg);transform: rotateZ(" + -rot + "deg);")
-         hoursClockFace.appendChild(numContainer);
-     }
-
+            var rot = 180 + (n * 30);
+            numContainer.setAttribute("style", "-webkit-transform: rotateZ(" + rot + "deg);-moz-transform: rotateZ(" + rot + "deg);transform: rotateZ(" + rot + "deg);")
+            num.setAttribute("style", "-webkit-transform: rotateZ(" + -rot + "deg);-moz-transform: rotateZ(" + -rot + "deg);transform: rotateZ(" + -rot + "deg);")
+            hoursClockFace.appendChild(numContainer);
+        }
+    }
      for (var m = 0; m < 60; m++) {
          var numContainer = document.createElement("div");
          numContainer.className = "ha-dp-clock-num ha-dp-minute-num";
@@ -849,7 +901,11 @@
          var rot = 180 + (m * 6);
          numContainer.setAttribute("style", "-webkit-transform: rotateZ(" + rot + "deg);-moz-transform: rotateZ(" + rot + "deg);transform: rotateZ(" + rot + "deg);")
          num.setAttribute("style", "-webkit-transform: rotateZ(" + -rot + "deg);-moz-transform: rotateZ(" + -rot + "deg);transform: rotateZ(" + -rot + "deg);")
-         clockFace.appendChild(numContainer);
+         if (this.options.is24) {
+            hoursClockFace.appendChild(numContainer);
+        } else {
+            clockFace.appendChild(numContainer);
+        }
      }
  }
 
@@ -926,7 +982,10 @@
          resString += (result.getMonth() + 1) + "/" + result.getDate() + "/" + result.getFullYear();
      if (this.selectedTime != null && !this.options.disableTime)
          resString += " " + twoDigits(result.getHours()) + ":" + twoDigits(result.getMinutes()) + " " + this.selectedTime.amOrPm;
-
+     if (this.options.is24) {
+            resString = (result.getMonth() + 1) + "/" + result.getDate() + "/" + result.getFullYear();
+            resString += " " + twoDigits(result.getHours()) + ":" + twoDigits(result.getMinutes());
+     }
      return resString.trim();
  }
 
@@ -990,14 +1049,28 @@
 
      do {
          var endTime = formattedResult.indexOf("{minute}") < 0 && formattedResult.indexOf("{hour}") < 0 && formattedResult.indexOf("{ampm}") < 0;
+         if (this.options.is24) {
+            var endTime = formattedResult.indexOf("{minute}") < 0 && formattedResult.indexOf("{hour}") < 0;
+        }
          if (this.selectedTime != null) {
-             formattedResult = formattedResult.replace("{hour}", twoDigits(this.getHours()))
-                 .replace("{minute}", twoDigits(this.getMinutes()))
-                 .replace("{ampm}", this.getAmOrPm().toUpperCase());
+            if (this.options.is24) {
+                formattedResult = formattedResult.replace("{hour}", twoDigits(this.getHours()))
+                    .replace("{minute}", twoDigits(this.getMinutes()))
+                    .replace("{ampm}", "");
+            } else {
+                formattedResult = formattedResult.replace("{hour}", twoDigits(this.getHours()))
+                    .replace("{minute}", twoDigits(this.getMinutes()))
+                    .replace("{ampm}", this.getAmOrPm().toUpperCase());
+            }
          } else {
-             formattedResult = formattedResult.replace("{hour}", "")
-                 .replace("{minute}", "")
-                 .replace("{ampm}", "");
+            if (this.options.is24) {
+                formattedResult = formattedResult.replace("{hour}", "")
+                    .replace("{minute}", "")
+            } else {
+                formattedResult = formattedResult.replace("{hour}", "")
+                    .replace("{minute}", "")
+                    .replace("{ampm}", "");
+            }
          }
      } while (!endTime)
 
@@ -1031,6 +1104,7 @@
              e.preventDefault();
              return false;
          });
+         var is24 = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-is24");
          var isSolar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-issolar");
          var isLunar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-islunar");
          var resultInSolar = caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-resultinsolar")
@@ -1045,6 +1119,7 @@
              maxYear: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-maxyear"),
              resultInSolar: resultInSolar,
              resultInLunar: resultInLunar,
+             is24: is24,
              isSolar: isSolar,
              isLunar: isLunar,
              extraTargets: caseInsensitiveGetAttribute(datePickers[d], "data-ha-dp-extratargets"),
