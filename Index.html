@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <title>HA-DateTimePicker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="src/ha-datetimepicker.min.css" rel="stylesheet">
+    <link href="src/ha-datetimepicker.css" rel="stylesheet">
     <style>
         html * {
             box-sizing: border-box;
@@ -71,6 +71,8 @@
         <label>Select a date and time(Solar Date):</label>
         <input type="text" id="date2" name="test" data-ha-datetimepicker="#date2" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" data-ha-dp-resultinsolar="true" data-ha-dp-disabledWeekDays="2,3,7" data-ha-dp-resultformat="{day}/{month}/{year}" value="1/6/1395"
         />
+        <label>Select a date and time(Solar Date - 24 Hours):</label>
+        <input type="text" id="date10" name="test" data-ha-dp-is24="true" data-ha-datetimepicker="#date10" data-ha-dp-forcesettime="true" data-ha-dp-issolar="true" data-ha-dp-resultinsolar="true" data-ha-dp-disabledWeekDays="2,3,7" data-ha-dp-resultformat="{day}/{month}/{year} {t?{hour}:{minute} {ampm}} " value="7/8/1398 20:40"/>
         <label>Select a date(Result in Solar):</label>
         <input type="text" id="date3" name="test" data-ha-datetimepicker="#date3" data-ha-dp-forcesettime="true" data-ha-dp-issolar="false" data-ha-dp-resultinsolar="true" data-ha-dp-disabledWeekDays="1,3,6,5,7" />
         <label>Called using Javascript:</label>
